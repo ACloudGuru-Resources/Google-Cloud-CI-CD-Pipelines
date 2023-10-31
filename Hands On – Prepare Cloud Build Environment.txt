@@ -1,0 +1,67 @@
+# Hands On – Prepare Cloud Build Environment
+# https://learn.acloud.guru/course/6af4abcf-01df-464b-8054-c39eac65c422/learn/10b509e6-e480-46b2-b57b-7c42f145ad39/81dd606f-f781-4f85-bb19-03c18c2847be/watch
+
+# In this first of our two part hands on demonstration, we are going to set up our Cloud Build and Cloud Source Repository environment, submit a manual build using Dockerfile, then submit an even more automated build request using a build file. Command line references used in this lesson are below:
+
+### enable APIs
+
+gcloud services enable sourcerepo.googleapis.com
+
+gcloud services enable cloudbuild.googleapis.com
+
+gcloud services enable run.googleapis.com
+
+### create source repo
+
+gcloud source repos create build-demo
+
+### Clone Repo into Cloud Shell
+
+gcloud source repos clone build-demo
+
+cd build-demo
+
+### Pull copy of GitHub example into directory
+
+git pull https://github.com/linuxacademy/content-gcpro-devops-engineer
+
+### enter example user info for commits
+
+git config --global user.email "matt@example.com"
+git config --global user.name "Matt"
+
+### Push cloned code into CSR
+
+git push origin master
+
+### browse to manual build demo directory
+
+cd cloud_build/build-run/
+
+### Assign project ID to $PROJECT_ID variable
+
+export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+
+### Submit manual build using Dockerfile to build the container, and push to Container Registry as 'build-run-image'
+
+gcloud builds submit --tag gcr.io/$PROJECT_ID/build-run-image
+
+### submit using cloudbuild.yaml file in current cloud shell directory
+
+gcloud builds submit --config cloudbuild.yaml
+
+### Deploy to Cloud Run
+
+gcloud run deploy cloud-run-deploy --image gcr.io/$PROJECT_ID/build-run-image --platform managed --region us-central1 --allow-unauthenticated
+
+**How to assign narrow-scoped access to service account in Cloud Build:**
+
+* Go to the Service accounts page of the Google Cloud Console:
+  * Go to Service accounts
+  * Select the Runtime Service Account of your Cloud Run (fully-managed) service: 
+    * By default it is *PROJECT\_NUMBER-compute@developer.gserviceaccount.com*
+  * Click **Show Info Panel** in the top-right corner, to show the *Permissions* tab
+  * Click the **Add member** button
+  * Enter the Cloud Build Service Account (*PROJECT\_NUMBER@cloudbuild.gserviceaccount.com*)
+  * In the Select a role dropdown, select the Service Accounts > Service Account User role
+  * Click **Save**
