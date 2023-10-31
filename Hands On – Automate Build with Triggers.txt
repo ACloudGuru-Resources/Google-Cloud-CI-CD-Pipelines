@@ -1,0 +1,9 @@
+# Hands On – Automate Build with Triggers
+# https://learn.acloud.guru/course/6af4abcf-01df-464b-8054-c39eac65c422/learn/10b509e6-e480-46b2-b57b-7c42f145ad39/14ffd0af-1e86-4f5b-a2ff-fdc201788632/watch
+
+# This second part of our hands-on demonstration will create triggers to automatically start a new build whenever we push a new commit to Cloud Source Repositories. The command-line format for creating a trigger is below. Keep in mind that as of this filming, `gcloud` commands for triggers are in beta, and you are unable to name the trigger via command line:
+
+gcloud beta builds triggers create cloud-source-repositories \
+--repo=build-demo \
+--branch-pattern="^master$" \
+--build-config=cloud_build/build-run/trigger-build.yaml
